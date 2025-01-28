@@ -20,7 +20,7 @@ public class ExcelReportGenerator {
     }
 
     public void gerarRelatorioExcel(int limiteDeAlertas) {
-        // Configurar JFileChooser para salvar o arquivo
+
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Salvar relatório em Excel");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -36,12 +36,10 @@ public class ExcelReportGenerator {
         File arquivoSelecionado = fileChooser.getSelectedFile();
         String caminhoArquivo = arquivoSelecionado.getAbsolutePath();
 
-        // Garantir que o arquivo tenha a extensão .xlsx
         if (!caminhoArquivo.endsWith(".xlsx")) {
             caminhoArquivo += ".xlsx";
         }
 
-        // Buscar dados para o relatório
         List<AlertaDTO> alertas = alertaDAO.buscarUltimosAlertas(limiteDeAlertas);
 
         if (alertas.isEmpty()) {
@@ -53,7 +51,6 @@ public class ExcelReportGenerator {
         }) {
             Sheet sheet = workbook.createSheet("Alertas Recentes");
 
-            // Criar cabeçalho
             Row headerRow = sheet.createRow(0);
             String[] colunas = {"Código", "Título", "Data e Hora", "Descrição"};
             for (int i = 0; i < colunas.length; i++) {
@@ -62,7 +59,6 @@ public class ExcelReportGenerator {
                 cell.setCellStyle(criarEstiloCabecalho(workbook));
             }
 
-            // Preencher os dados
             int rowNum = 1;
             for (AlertaDTO alerta : alertas) {
                 Row row = sheet.createRow(rowNum++);
@@ -72,12 +68,11 @@ public class ExcelReportGenerator {
                 row.createCell(3).setCellValue(alerta.getDescricao());
             }
 
-            // Ajustar largura das colunas automaticamente
             for (int i = 0; i < colunas.length; i++) {
                 sheet.autoSizeColumn(i);
             }
 
-            // Salvar o arquivo Excel
+
             try (FileOutputStream fileOut = new FileOutputStream(caminhoArquivo)) {
                 workbook.write(fileOut);
                 System.out.println("Relatório Excel gerado com sucesso: " + caminhoArquivo);

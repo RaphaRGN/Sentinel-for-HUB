@@ -53,6 +53,7 @@ public class AlertaDAO {
                 alerta.setDescricao(rs.getString("descricao"));
 
                 alertas.add(alerta);
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
