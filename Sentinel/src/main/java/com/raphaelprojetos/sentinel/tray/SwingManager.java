@@ -19,6 +19,7 @@
     import javax.swing.table.DefaultTableModel;
     import java.awt.*;
     import java.awt.event.*;
+    import java.lang.reflect.InvocationTargetException;
     import java.time.LocalDateTime;
     import java.util.List;
 
@@ -216,6 +217,9 @@
             JXButton botaoReports = new JXButton("Gerar relatórios");
             botaoReports.addActionListener(e -> cardLayout.show(cardPanel, "Reports"));
 
+            autenticacaoBotoes(botaoConfiguracao);
+            autenticacaoBotoes(botaoReports);
+
             panelSuperior.add(Box.createHorizontalGlue());
             panelSuperior.add(botaoReports);
             panelSuperior.add(Box.createHorizontalStrut(10));
@@ -394,10 +398,16 @@
 
                 if (usuario != null) {
                     usuarioLogado = usuario;
-                    JOptionPane.showMessageDialog(null, "Bem-vindo, " + usuario.getNome() + " !");
+                    JOptionPane.showMessageDialog(null, "Bem-vindo, " + usuario.getNome() + " ! \r Feche a aplicação para atualizá-la ! ");
+
                     cardLayout.show(cardPanel, "Main");
+                    this.revalidate();
+                    this.repaint();
+                    cardPanel.revalidate();
+                    cardPanel.repaint();
                     atualizarTabelaAlertas();
                     adicionarTabelaUsuarios();
+
 
                 } else {
                     JOptionPane.showMessageDialog(null, "Usuário ou senha inválidos.");
@@ -684,6 +694,8 @@
             JXButton botaoGerarExcel = new JXButton("Gerar Excel");
             panelReports.add(botaoGerarExcel, gbc);
 
+            autenticacaoBotoes(botaoGerarPDF);
+            autenticacaoBotoes(botaoGerarExcel);
             gbc.gridy++;
             JXButton botaoVoltarMain = new JXButton("Voltar para a tela principal");
             panelReports.add(botaoVoltarMain, gbc);
@@ -692,18 +704,12 @@
             botaoGerarPDF.addActionListener(e-> pdfGenerator.gerarRelatorioPDF(10));
             botaoVoltarMain.addActionListener(e -> cardLayout.show(cardPanel, "Main"));
 
-            autenticacaoBotoesRelatorios(botaoGerarExcel);
-            autenticacaoBotoesRelatorios(botaoGerarPDF);
-
-
             return panelReports;
         }
 
 
 
        //MÉTODOS UNIVERSAIS
-
-
 
         private void atualizarTabelaAlertas() {
             DefaultTableModel model = (DefaultTableModel) tabelaAlertas.getModel();
@@ -760,18 +766,21 @@
         }
 
 
-        private void autenticacaoBotoesRelatorios(JXButton botao){
+        private void autenticacaoBotoes(JXButton botao){
 
             if(usuarioLogado == null){
 
                 botao.setEnabled(false);
-
+                cardPanel.repaint();
+                cardPanel.revalidate();
 
             }
 
             if(usuarioLogado != null){
 
                 botao.setEnabled(true);
+                cardPanel.repaint();
+                cardPanel.revalidate();
 
             }
 
@@ -780,10 +789,14 @@
         private void atualizarNomeBotao(JXButton botao){
             if(usuarioLogado == null){
                 botao.setText("Login");
+                cardPanel.repaint();
+                cardPanel.revalidate();
 
             }
             else{
                 botao.setText(usuarioLogado.getNome());
+                cardPanel.repaint();
+                cardPanel.revalidate();
 
             }
         }

@@ -19,7 +19,7 @@ public class AlertaConsumer {
         LOGGER.info("Iniciando o consumidor de alertas...");
 
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("10.0.0.25");
+        factory.setHost("192.168.0.16");
         factory.setPort(5672);
         factory.setUsername("SentinelHUB");
         factory.setPassword("root");
