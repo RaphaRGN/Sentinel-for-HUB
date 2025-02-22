@@ -21,6 +21,7 @@
     import java.awt.event.*;
     import java.lang.reflect.InvocationTargetException;
     import java.time.LocalDateTime;
+    import java.util.ArrayList;
     import java.util.List;
 
     @Component
@@ -34,6 +35,7 @@
         private JXTable tabelaUsuarios;
         private AlertaConsumer alertaConsumer;
         private JFrame popupFrame;
+        private ArrayList<JXButton> botoesParaAutenticar = new ArrayList<>();
         private final ExcelReportGenerator excelGenerator = new ExcelReportGenerator();
         private final PdfReportGenerator pdfGenerator = new PdfReportGenerator();
         private final RabbitMQClient rabbitMQClient = new RabbitMQClient();
@@ -204,9 +206,7 @@
                         atualizarTabelaAlertas();
                         cardLayout.show(cardPanel, "Main");
                         atualizarNomeBotao(botaoLogin);
-                        SwingUtilities.invokeLater(() -> {
-
-                        });
+                        autenticacaoBotoes(botoesParaAutenticar);
                     }
                 }
             });
@@ -217,8 +217,11 @@
             JXButton botaoReports = new JXButton("Gerar relatórios");
             botaoReports.addActionListener(e -> cardLayout.show(cardPanel, "Reports"));
 
-            autenticacaoBotoes(botaoConfiguracao);
-            autenticacaoBotoes(botaoReports);
+            botoesParaAutenticar.add(botaoReports);
+            botoesParaAutenticar.add(botaoConfiguracao);
+            autenticacaoBotoes(botoesParaAutenticar);
+
+
 
             panelSuperior.add(Box.createHorizontalGlue());
             panelSuperior.add(botaoReports);
@@ -401,10 +404,7 @@
                     JOptionPane.showMessageDialog(null, "Bem-vindo, " + usuario.getNome() + " ! \r Feche a aplicação para atualizá-la ! ");
 
                     cardLayout.show(cardPanel, "Main");
-                    this.revalidate();
-                    this.repaint();
-                    cardPanel.revalidate();
-                    cardPanel.repaint();
+                   autenticacaoBotoes(botoesParaAutenticar);
                     atualizarTabelaAlertas();
                     adicionarTabelaUsuarios();
 
@@ -694,8 +694,7 @@
             JXButton botaoGerarExcel = new JXButton("Gerar Excel");
             panelReports.add(botaoGerarExcel, gbc);
 
-            autenticacaoBotoes(botaoGerarPDF);
-            autenticacaoBotoes(botaoGerarExcel);
+
             gbc.gridy++;
             JXButton botaoVoltarMain = new JXButton("Voltar para a tela principal");
             panelReports.add(botaoVoltarMain, gbc);
@@ -766,24 +765,28 @@
         }
 
 
-        private void autenticacaoBotoes(JXButton botao){
+        private void autenticacaoBotoes(ArrayList<JXButton> botoes){
 
             if(usuarioLogado == null){
 
-                botao.setEnabled(false);
-                cardPanel.repaint();
-                cardPanel.revalidate();
+                for (JXButton botao : botoes){
+
+                    botao.setEnabled(false);
+
+                    System.out.println("Iterei aqui ein FALSE");
+
+                }
 
             }
 
-            if(usuarioLogado != null){
+            if(usuarioLogado != null) {
 
-                botao.setEnabled(true);
-                cardPanel.repaint();
-                cardPanel.revalidate();
+                for (JXButton botao : botoes) {
 
+                    botao.setEnabled(true);
+                    System.out.println("Iterei aqui ein TRUE");
+                }
             }
-
         }
 
         private void atualizarNomeBotao(JXButton botao){
