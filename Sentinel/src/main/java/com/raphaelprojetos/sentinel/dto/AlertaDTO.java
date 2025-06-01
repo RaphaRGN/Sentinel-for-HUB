@@ -19,6 +19,7 @@ public class AlertaDTO {
 
     }
 
+
     public AlertaDTO(String codigo, String titulo, LocalDateTime tempo, String descricao ){
 
 

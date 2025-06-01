@@ -1,5 +1,6 @@
 package com.raphaelprojetos.sentinel.database;
 
+import com.raphaelprojetos.sentinel.config.DotEnvConfig;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -12,19 +13,14 @@ public class Database {
     private static HikariConfig config = new HikariConfig();
     private static HikariDataSource ds;
 
-
     static {
 
-        String endercoAtualBanco = System.getenv("DB_HOST");
-        String usuarioBanco = System.getenv("DB_USER");
-        String nomeBanco = "Sentinel";
-        String senhaBanco = System.getenv("DB_PASSWORD");
+        String endercoAtualBanco = DotEnvConfig.getEnvVar("CENTRAL_IP");
+        String usuarioBanco = DotEnvConfig.getEnvVar("DB_USERNAME");
+        String nomeBanco = DotEnvConfig.getEnvVar("DB_NOME");
+        String senhaBanco = DotEnvConfig.getEnvVar("DB_PASSWORD");
 
         String jdbc = "jdbc:postgresql://" + endercoAtualBanco + "/" + nomeBanco;
-
-        System.out.println(jdbc);
-        System.out.println(usuarioBanco);
-        System.out.println(senhaBanco);
 
         config.setJdbcUrl(jdbc);
         config.setUsername(usuarioBanco);

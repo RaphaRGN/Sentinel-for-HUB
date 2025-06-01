@@ -3,6 +3,7 @@ package com.raphaelprojetos.sentinel.rabbitmq;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import com.raphaelprojetos.sentinel.config.DotEnvConfig;
 
 
 public class RabbitMQClient {
@@ -11,10 +12,10 @@ public class RabbitMQClient {
 
     public void enviarAlerta(String alertaRabbit) throws Exception{
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("192.168.0.16");
+        factory.setHost(DotEnvConfig.getEnvVar("CENTRAL_IP"));
         factory.setPort(5672);
-        factory.setUsername("SentinelHUB");
-        factory.setPassword("root");
+        factory.setUsername(DotEnvConfig.getEnvVar("RABBITMQ_USERNAME"));
+        factory.setPassword(DotEnvConfig.getEnvVar("RABBITMQ_PASSWORD"));
 
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {

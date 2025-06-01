@@ -34,6 +34,7 @@
         private JXTable tabelaAlertas;
         private JXTable tabelaUsuarios;
         private AlertaConsumer alertaConsumer;
+        private SwingTools utilidades;
         private JFrame popupFrame;
         private ArrayList<JXButton> botoesParaAutenticar = new ArrayList<>();
         private final ExcelReportGenerator excelGenerator = new ExcelReportGenerator();
@@ -96,7 +97,9 @@
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-                atualizarTabelaAlertas();
+
+                utilidades.atualizarTabelaAlertas(usuarioLogado, tabelaAlertas);
+
             });
         }
 
@@ -113,39 +116,43 @@
             bloqueioFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
             bloqueioFrame.setBackground(new Color(151, 149, 149, 200)); // Fundo semitransparente
 
-                String colorName = alerta.getCodigo();
+            String colorName = alerta.getCodigo();
 
-                   switch (colorName){
+            switch (colorName) {
 
-                       case "Vermelho":
-                           bloqueioFrame.setBackground(new Color(228, 56, 56, 200));
+                case "Vermelho":
+                    bloqueioFrame.setBackground(new Color(228, 56, 56, 200));
 
-                           break;
+                    break;
 
-                       case "Amarelo":
-                           bloqueioFrame.setBackground(new Color(204, 204, 68, 200));
+                case "Amarelo":
+                    bloqueioFrame.setBackground(new Color(204, 204, 68, 200));
 
-                           break;
-                       case "Rosa":
-                           bloqueioFrame.setBackground(new Color(227, 141, 227, 200));
+                    break;
+                case "Rosa":
+                    bloqueioFrame.setBackground(new Color(227, 141, 227, 200));
 
-                            break;
-                       case "Verde":
-                           bloqueioFrame.setBackground(new Color(70, 216, 70, 200));
+                    break;
+                case "Verde":
+                    bloqueioFrame.setBackground(new Color(70, 216, 70, 200));
 
-                           break;
-                       default:
-                           bloqueioFrame.setBackground(new Color(151, 149, 149, 200));
+                    break;
 
-                           break;
-                   }
+                case "Treinamento":
+                    bloqueioFrame.setBackground(new Color(245, 245, 245, 200));
+
+                default:
+                    bloqueioFrame.setBackground(new Color(115, 114, 114, 200));
+
+                    break;
+            }
 
             String caminhoImagemBrigada = getClass().getResource("/images/SimboloBrigada.png").toString();
             JLabel mensagemLabel = new JLabel("<html>" +
                     "<div style='text-align:center;'>" +
                     "<img src='" + caminhoImagemBrigada + "' width='200' height='200'>" +
                     "</div>" +
-                    "<h1 style='text-align:center; font-size:25px;'><strong>Código: </strong>"  + alerta.getCodigo() + "</h1>" +
+                    "<h1 style='text-align:center; font-size:25px;'><strong>Código: </strong>" + alerta.getCodigo() + "</h1>" +
                     "<p style='font-size:25px; text-align:center;'><strong>Setor: </strong>" + alerta.getTitulo() + "</p>" +
                     "<p style='font-size:30px; text-align:center;'><strong>Descrição: </strong>" + alerta.getDescricao() + "</p>" +
                     "<p style='font-size:20px; text-align:center;'><strong>Data/Hora: </strong>" + alerta.getTempoFormatado() + "</p>" +
@@ -162,7 +169,7 @@
             cooldownTimer.start();
         }
 
-        SwingWorker <Void, Void> consumerWorker = new SwingWorker<Void, Void>() {
+        SwingWorker<Void, Void> consumerWorker = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
                 alertaConsumer = new AlertaConsumer(SwingManager.this);
@@ -192,7 +199,7 @@
             panelSuperior.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
             JXButton botaoLogin = new JXButton();
-            atualizarNomeBotao(botaoLogin);
+            utilidades.atualizarNomeBotao(botaoLogin, usuarioLogado, cardPanel);
             botaoLogin.addActionListener(e -> {
                 if (usuarioLogado == null) {
                     cardLayout.show(cardPanel, "Login");
@@ -203,10 +210,10 @@
                     if (confirmacao == JOptionPane.YES_OPTION) {
                         usuarioLogado = null;
                         JOptionPane.showMessageDialog(null, "Você foi desconectado!");
-                        atualizarTabelaAlertas();
+                        utilidades.atualizarTabelaAlertas(usuarioLogado, tabelaAlertas);
                         cardLayout.show(cardPanel, "Main");
-                        atualizarNomeBotao(botaoLogin);
-                        autenticacaoBotoes(botoesParaAutenticar);
+                        utilidades.atualizarNomeBotao(botaoLogin, usuarioLogado, cardPanel);
+                        utilidades.autenticacaoBotoes(botoesParaAutenticar, usuarioLogado);
                     }
                 }
             });
@@ -219,8 +226,7 @@
 
             botoesParaAutenticar.add(botaoReports);
             botoesParaAutenticar.add(botaoConfiguracao);
-            autenticacaoBotoes(botoesParaAutenticar);
-
+            utilidades.autenticacaoBotoes(botoesParaAutenticar, usuarioLogado);
 
 
             panelSuperior.add(Box.createHorizontalGlue());
@@ -299,7 +305,7 @@
 
                             rabbitMQClient.enviarAlerta(alerta.toJson());
 
-                            SwingUtilities.invokeLater(()-> atualizarTabelaAlertas());
+                            SwingUtilities.invokeLater(() -> utilidades.atualizarTabelaAlertas(usuarioLogado, tabelaAlertas));
 
                         } catch (Exception ex) {
                             JOptionPane.showMessageDialog(null, "Erro ao enviar o alerta: " + ex.getMessage());
@@ -329,7 +335,7 @@
             panelMain.add(panelCentral, BorderLayout.CENTER);
             panelMain.add(panelInferior, BorderLayout.SOUTH);
 
-            atualizarTabelaAlertas();
+            utilidades.atualizarTabelaAlertas(usuarioLogado, tabelaAlertas);
             return panelMain;
         }
 
@@ -404,9 +410,10 @@
                     JOptionPane.showMessageDialog(null, "Bem-vindo, " + usuario.getNome() + " ! \r Feche a aplicação para atualizá-la ! ");
 
                     cardLayout.show(cardPanel, "Main");
-                   autenticacaoBotoes(botoesParaAutenticar);
-                    atualizarTabelaAlertas();
-                    adicionarTabelaUsuarios();
+
+                    utilidades.autenticacaoBotoes(botoesParaAutenticar, usuarioLogado);
+                    utilidades.atualizarTabelaAlertas(usuarioLogado, tabelaAlertas);
+                    utilidades.adicionarTabelaUsuarios(usuarioLogado, tabelaUsuarios);
 
 
                 } else {
@@ -513,7 +520,7 @@
 
                 if (confirmacao == JOptionPane.YES_NO_OPTION) {
                     usuarioDao.deletarUsuarioPorId(idUsuario);
-                    adicionarTabelaUsuarios();
+                    utilidades.adicionarTabelaUsuarios(usuarioLogado, tabelaUsuarios);
                     JOptionPane.showMessageDialog(null, "Usuário deletado com sucesso!");
                 }
             });
@@ -534,9 +541,9 @@
                     .addGap(20)
                     .addComponent(botaoVoltarMain)
             );
-            adicionarTabelaUsuarios();
+            utilidades.adicionarTabelaUsuarios(usuarioLogado, tabelaUsuarios);
             return panelUsuariosAtivos;
-            
+
         }
 
         private JPanel createnewUserPanel() {
@@ -592,7 +599,7 @@
                     usuarioDAO.salvarUsuario(novoUsuario);
 
                     JOptionPane.showMessageDialog(null, "Usuário criado com sucesso!");
-                    adicionarTabelaUsuarios();
+                    utilidades.adicionarTabelaUsuarios(usuarioLogado, tabelaUsuarios);
                     cardLayout.show(cardPanel, "activeUsers");
 
                 } catch (Exception exception) {
@@ -667,7 +674,7 @@
                 usuarioSelecionado.setAdmin(isAdmin);
 
                 usuarioDAO.atualizarUsuario(usuarioSelecionado);
-                adicionarTabelaUsuarios();
+                utilidades.adicionarTabelaUsuarios(usuarioLogado, tabelaUsuarios);
 
                 JOptionPane.showMessageDialog(null, "Usuário salvo com sucesso!");
                 cardLayout.show(cardPanel, "activeUsers");
@@ -700,107 +707,9 @@
             panelReports.add(botaoVoltarMain, gbc);
 
             botaoGerarExcel.addActionListener(e -> excelGenerator.gerarRelatorioExcel(10));
-            botaoGerarPDF.addActionListener(e-> pdfGenerator.gerarRelatorioPDF(10));
+            botaoGerarPDF.addActionListener(e -> pdfGenerator.gerarRelatorioPDF(10));
             botaoVoltarMain.addActionListener(e -> cardLayout.show(cardPanel, "Main"));
 
             return panelReports;
-        }
-
-
-
-       //MÉTODOS UNIVERSAIS
-
-        private void atualizarTabelaAlertas() {
-            DefaultTableModel model = (DefaultTableModel) tabelaAlertas.getModel();
-
-            if (usuarioLogado == null || !usuarioLogado.isAdmin()) {
-               model.setRowCount(0);
-                return;
-            }
-
-            try {
-                AlertaDAO alertaDAO = new AlertaDAO();
-                List<AlertaDTO> alertas = alertaDAO.buscarUltimosAlertas(10);
-
-                model.setRowCount(0);
-
-                for (AlertaDTO alerta : alertas) {
-                    model.addRow(new Object[]{
-                            alerta.getCodigo(),
-                            alerta.getTitulo(),
-                            alerta.getDescricao(),
-                            alerta.getTempoFormatado()
-                    });
-                }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Erro ao atualizar alertas: " + e.getMessage());
-            }
-        }
-
-        private void adicionarTabelaUsuarios(){
-            DefaultTableModel model = (DefaultTableModel) tabelaUsuarios.getModel();
-
-            if (usuarioLogado == null || !usuarioLogado.isAdmin()) {
-                model.setRowCount(0);
-                return;
-            }
-            try{
-                UsuarioDAO usuarios = new UsuarioDAO();
-                List<UsuarioDTO> listaUsuarios = usuarios.buscarTodosUsuarios();
-
-                model.setRowCount(0);
-
-                for (UsuarioDTO usuarioDTO : listaUsuarios){
-
-                    model.addRow(new Object[]{
-                            usuarioDTO.getId(),
-                            usuarioDTO.getNome(),
-                            usuarioDTO.isAdmin(),
-                    });
-                }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Erro ao checar usuários: " + e.getMessage());
-
-            }
-        }
-
-
-        private void autenticacaoBotoes(ArrayList<JXButton> botoes){
-
-            if(usuarioLogado == null){
-
-                for (JXButton botao : botoes){
-
-                    botao.setEnabled(false);
-
-                    System.out.println("Iterei aqui ein FALSE");
-
-                }
-
-            }
-
-            if(usuarioLogado != null) {
-
-                for (JXButton botao : botoes) {
-
-                    botao.setEnabled(true);
-                    System.out.println("Iterei aqui ein TRUE");
-                }
-            }
-        }
-
-        private void atualizarNomeBotao(JXButton botao){
-            if(usuarioLogado == null){
-                botao.setText("Login");
-                cardPanel.repaint();
-                cardPanel.revalidate();
-
-            }
-            else{
-                botao.setText(usuarioLogado.getNome());
-                cardPanel.repaint();
-                cardPanel.revalidate();
-
-            }
         }
     }

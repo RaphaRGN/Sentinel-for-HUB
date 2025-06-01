@@ -157,6 +157,7 @@ public class UsuarioDAO {
     }
 
 
+
     public boolean atuaizarSenhaUsuario(Long idUsuario, String novaSenha){
        String sql = "UPDATE usuarios SET senha = ? WHERE id = ?";
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();

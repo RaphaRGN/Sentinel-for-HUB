@@ -1,4 +1,5 @@
 package com.raphaelprojetos.sentinel.dao;
+import com.raphaelprojetos.sentinel.config.DotEnvConfig;
 import com.raphaelprojetos.sentinel.dto.AlertaDTO;
 
 import javax.swing.*;
